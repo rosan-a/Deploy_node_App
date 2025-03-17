@@ -1,21 +1,25 @@
-# Our node app is based on `18-alpine` image 
+# Use a minimal Node.js 18 Alpine image
 FROM node:18-alpine
 
-# Setting up the environment variables needed:
-ENV DOMAIN="http://localhost:3000" \
-PORT=3000 \
-STATIC_DIR="./client" \
-PUBLISHABLE_KEY="pk_test_51L5AsSSCC8JVWfvgEtfJkzHMTh7Z5PLY5m1yhR379sJgwAVZEe13NaiG33wsHSyHnPJMjTNOosiPk6AeMI8q0ims0049IKffiu" \
-SECRET_KEY="sk_test_51L5AsSSCC8JVWfvgxpyZvQyBRRkHmGBkdyIa94vPD3Zs71qbHGrnSPlrJOIWiR74fbcn1A85yESCFnrrp3aX0Oz900JaunHrhe"
-
+# Set working directory
 WORKDIR /usr/src/app
 
+# Copy package.json and package-lock.json before copying the rest of the files
 COPY package*.json ./
 
-RUN npm install
+# Install dependencies
+RUN npm ci --only=production
 
+# Copy application source code
 COPY . .
 
+# Expose the application port
 EXPOSE 3000
 
+# Set runtime environment variables (should be passed at runtime, not hardcoded)
+ENV DOMAIN="http://localhost:3000" \
+    PORT=3000 \
+    STATIC_DIR="./client"
+
+# Use CMD to run the application
 CMD ["node", "server.js"]
